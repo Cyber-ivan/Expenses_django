@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from expense.forms import UserCreationForm
 
 
+
 class Register(View):
     template_name = 'registration/register.html'
 
@@ -20,19 +21,12 @@ class Register(View):
         form = UserCreationForm(request.POST)
 
         if form.is_valid():
-            user = form.save()  # Сохраняем пользователя
-            username = form.cleaned_data.get('username')
+            form.save()
+            email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password1')
-
-            # Аутентифицируем пользователя
-            user = authenticate(request, username=username, password=password)
-
-            if user is not None:
-                login(request, user)  # Логиним пользователя
-                return redirect('home')
-
-            # Если аутентификация не удалась, возвращаем ошибку
-            form.add_error(None, "Authentication failed. Please try again.")
+            user = authenticate(email=email, password=password)
+            login(request, user)
+            return redirect('home')
 
         # Если форма невалидна, возвращаем её с ошибками
         context = {

@@ -1,7 +1,7 @@
-from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
-
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 class Group_users(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -50,13 +50,16 @@ class Group_users(models.Model):
 
 class User(AbstractUser):
     username = models.CharField(max_length=150, null=True, blank=True)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(
+        _('email address'),
+        unique=True,
+    )
     telegram_id = models.BigIntegerField(null=True, blank=True)
     money = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     my_groups = models.ManyToManyField(Group_users)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
     @staticmethod
     def create_user(first_name, last_name, email, password, telegram_id=None, money=0.00):
