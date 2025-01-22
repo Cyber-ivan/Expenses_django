@@ -1,13 +1,111 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome, {{ user }}</h1>
+        <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+        </form>
 
-{% block content %}
-    <h1>Home page</h1>
+    <form method="post">
+        {% csrf_token %}
+        <h2>Add Expense or Income</h2>
+        <label for="money">Введите сумму</label>
+        <input type="number" step="0.01" name="money" id="money" required>
+
+        <label for="categories">Категории:</label>
+        <select name="categories" id="categories">
+            <option value="">No category</option>
+            {% for category in categories %}
+                <li>{{category}}</li>
+            {% endfor %}
+        </select>
+        <h2>Categories</h2>
+<ul>
+    {% for category in categories %}
+        <li>{{ category.name }}</li>
+    {% endfor %}
+</ul>
+
+        <label for="comment">Comment:</label>
+        <input type="text" name="comment" id="comment">
+
+        <label for="income">Is Income?</label>
+        <input type="checkbox" name="income" id="income">
+
+        <button type="submit">Add</button>
+    </form>
+
     <hr>
 
-    {% if user.is_authenticated %}
-        <a href="{% url 'logout' %}">Logout</a>
+    <!-- Остальная часть шаблона -->
+    <h2>Your Income:</h2>
+    {% if incomes %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Comment</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for income in incomes %}
+                    <tr>
+                        <td>
+                            {% if income.category %}
+                                {{ income.category.name }}
+                            {% else %}
+                                No category
+                            {% endif %}
+                        </td>
+                        <td>{{ income.money }}</td>
+                        <td>{{ income.comment|default:"No comment" }}</td>
+                        <td>{{ income.date }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
-        <a href="{% url 'login' %}">Login</a> |
-        <a href="{% url 'register' %}">Register</a>
+        <p>No income records found.</p>
     {% endif %}
-{% endblock %}
+
+    <h2>Your Expenses:</h2>
+    {% if expenses %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Comment</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                    <tr>
+                        <td>
+                            {% if expense.category %}
+                                {{ expense.category.name }}
+                            {% else %}
+                                No category
+                            {% endif %}
+                        </td>
+                        <td>{{ expense.money }}</td>
+                        <td>{{ expense.comment|default:"No comment" }}</td>
+                        <td>{{ expense.date }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No expense records found.</p>
+    {% endif %}
+</body>
+</html>

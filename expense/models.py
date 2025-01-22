@@ -61,34 +61,6 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-    @staticmethod
-    def create_user(first_name, last_name, email, password, telegram_id=None, money=0.00):
-        """
-        Создает и возвращает нового пользователя.
-
-        :param first_name: Имя пользователя.
-        :param last_name: Фамилия пользователя.
-        :param email: Уникальный адрес электронной почты пользователя.
-        :param password: Пароль пользователя (будет хэширован).
-        :param telegram_id: (Необязательно) Идентификатор Telegram.
-        :param money: (Необязательно) Стартовый баланс пользователя.
-        :return: Экземпляр созданного пользователя.
-        :raises ValueError: Если email уже существует в базе данных.
-        """
-        if User.objects.filter(email=email).exists():
-            raise ValueError("Пользователь с таким email уже существует.")
-
-        # Используем стандартное поле password для хеширования
-        user = User(
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            telegram_id=telegram_id,
-            money=money,
-        )
-        user.set_password(password)  # Используем set_password для хеширования пароля
-        user.save()
-        return user
 
     @staticmethod
     def get_user(user_id):
@@ -97,24 +69,6 @@ class User(AbstractUser):
         """
         return User.objects.get(id=user_id)
 
-    @staticmethod
-    def update_user(user_id, **kwargs):
-        """
-        Обновляет данные пользователя.
-        """
-        user = User.objects.get(id=user_id)
-        for key, value in kwargs.items():
-            setattr(user, key, value)
-        user.save()
-        return user
-
-    @staticmethod
-    def delete_user(user_id):
-        """
-        Удаляет пользователя по ID.
-        """
-        user = User.objects.get(id=user_id)
-        user.delete()
 
     def __str__(self):
         return self.username

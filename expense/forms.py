@@ -6,6 +6,10 @@ from django.utils.translation import gettext_lazy as _
 User = get_user_model()
 
 
+class HomePage(forms.Form):
+    category = forms.CharField(required=False, label="Category", max_length=100)
+
+
 class UserCreationForm(UserCreationForm):
     email = forms.EmailField(
         label=_("Email"),
