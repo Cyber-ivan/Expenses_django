@@ -10,54 +10,52 @@ from expense.forms import UserCreationForm
 from django.shortcuts import render
 from django.views import View
 from .forms import HomePage
+from .forms import ExpenseForm
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
-
-class Test(View):
-    template_name = 'test.html'
-
-    def get(self, request):
-        categories = Category.objects.all()  # Загрузка всех категорий
-
-        context = {
-            'categories': categories,
-        }
-        return render(request, self.template_name, context)
 class Home(View):
-    template_name = 'expense/home.html'
+    template_name = 'home.html'
 
     @method_decorator(login_required)
     def get(self, request):
-        expenses = Expense.objects.filter(user=request.user, income=False)
+        categories = Category.objects.all()
+        expenses = Expense.objects.filter(user=request.user)
         incomes = Expense.objects.filter(user=request.user, income=True)
-        categories = Category.objects.all()  # Загрузка всех категорий
 
         context = {
-            'user': request.user.username,
+            'categories': categories,
             'expenses': expenses,
             'incomes': incomes,
-            'categories': categories,
         }
         return render(request, self.template_name, context)
 
     @method_decorator(login_required)
     def post(self, request):
-        category_id = request.POST.get('category')
         money = request.POST.get('money')
+        category_id = request.POST.get('category_in')
         comment = request.POST.get('comment')
-        income = request.POST.get('income', False) == 'on'
+        income = True if request.POST.get('income') else False
 
-        if not money:
-            return self.get(request)  # Перезагрузка с формой ошибки
-
-        category = get_object_or_404(Category, id=category_id) if category_id else None
-        Expense.objects.create(
+        # Создаём новый расход
+        expense = Expense.objects.create(
             user=request.user,
-            category=category,
             money=money,
+            category_id=category_id,
             comment=comment,
             income=income
         )
-        return self.get(request)  # Перезагрузка после добавления
+        categories = Category.objects.all()
+        expenses = Expense.objects.filter(user=request.user)
+        incomes = Expense.objects.filter(user=request.user, income=True)
+
+        context = {
+            'categories': categories,
+            'expenses': expenses,
+            'incomes': incomes,
+        }
+
+        return HttpResponseRedirect(reverse('test'))
 
 
 class Register(View):

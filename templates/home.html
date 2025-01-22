@@ -2,110 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>TEST</title>
 </head>
 <body>
-    <h1>Welcome, {{ user }}</h1>
-        <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-        </form>
+<h1>Welcome, {{ user }}</h1>
 
-    <form method="post">
-        {% csrf_token %}
-        <h2>Add Expense or Income</h2>
-        <label for="money">Введите сумму</label>
-        <input type="number" step="0.01" name="money" id="money" required>
+<form method="post">
+    {% csrf_token %}
+    <h2>Добавьте расходы или зарплату</h2>
 
-        <label for="categories">Категории:</label>
-        <select name="categories" id="categories">
-            <option value="">No category</option>
-            {% for category in categories %}
-                <li>{{category}}</li>
-            {% endfor %}
-        </select>
-        <h2>Categories</h2>
-<ul>
-    {% for category in categories %}
-        <li>{{ category.name }}</li>
-    {% endfor %}
-</ul>
+    <label for="money">Введите сумму</label>
+    <input type="number" step="0.01" name="money" id="money" required>
 
-        <label for="comment">Comment:</label>
-        <input type="text" name="comment" id="comment">
+    <label for="category_in">Категории:</label>
+    <select name="category_in" id="category_in">
+        <option value="">No category</option>
+        {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+    </select>
 
-        <label for="income">Is Income?</label>
-        <input type="checkbox" name="income" id="income">
+    <label for="comment">Комментарий:</label>
+    <input type="text" name="comment" id="comment">
 
-        <button type="submit">Add</button>
-    </form>
+    <label for="income">Доход?</label>
+    <input type="checkbox" name="income" id="income">
 
-    <hr>
+    <button type="submit">Добавить</button>
+</form>
 
-    <!-- Остальная часть шаблона -->
-    <h2>Your Income:</h2>
-    {% if incomes %}
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th>Amount</th>
-                    <th>Comment</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for income in incomes %}
-                    <tr>
-                        <td>
-                            {% if income.category %}
-                                {{ income.category.name }}
-                            {% else %}
-                                No category
-                            {% endif %}
-                        </td>
-                        <td>{{ income.money }}</td>
-                        <td>{{ income.comment|default:"No comment" }}</td>
-                        <td>{{ income.date }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No income records found.</p>
-    {% endif %}
+<h3>Таблица расходов:</h3>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Сумма</th>
+            <th>Категория</th>
+            <th>Комментарий</th>
+            <th>Дата</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for expense in expenses %}
+        <tr>
+            <td>{{ expense.money }}</td>
+            <td>{{ expense.category.name}}</td>
+            <td>
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            </td>
+            <td>{{ expense.date }}</td>
 
-    <h2>Your Expenses:</h2>
-    {% if expenses %}
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th>Amount</th>
-                    <th>Comment</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for expense in expenses %}
-                    <tr>
-                        <td>
-                            {% if expense.category %}
-                                {{ expense.category.name }}
-                            {% else %}
-                                No category
-                            {% endif %}
-                        </td>
-                        <td>{{ expense.money }}</td>
-                        <td>{{ expense.comment|default:"No comment" }}</td>
-                        <td>{{ expense.date }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No expense records found.</p>
-    {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 </body>
 </html>
