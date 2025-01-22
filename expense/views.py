@@ -20,13 +20,12 @@ class Home(View):
     @method_decorator(login_required)
     def get(self, request):
         categories = Category.objects.all()
-        expenses = Expense.objects.filter(user=request.user)
-        incomes = Expense.objects.filter(user=request.user, income=True)
+        expenses = Expense.objects.filter(user=request.user).order_by('-date')
+
 
         context = {
             'categories': categories,
             'expenses': expenses,
-            'incomes': incomes,
         }
         return render(request, self.template_name, context)
 
@@ -45,15 +44,15 @@ class Home(View):
             comment=comment,
             income=income
         )
-        categories = Category.objects.all()
-        expenses = Expense.objects.filter(user=request.user)
-        incomes = Expense.objects.filter(user=request.user, income=True)
-
-        context = {
-            'categories': categories,
-            'expenses': expenses,
-            'incomes': incomes,
-        }
+        # categories = Category.objects.all()
+        # expenses = Expense.objects.filter(user=request.user)
+        # incomes = Expense.objects.filter(user=request.user, income=True)
+        #
+        # context = {
+        #     'categories': categories,
+        #     'expenses': expenses,
+        #     'incomes': incomes,
+        # }
 
         return HttpResponseRedirect(reverse('test'))
 

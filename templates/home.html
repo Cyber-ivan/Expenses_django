@@ -2,59 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TEST</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-<h1>Welcome, {{ user }}</h1>
+    <header>
+        <h1>Привет, {{ user }}</h1>
+    </header>
 
-<form method="post">
-    {% csrf_token %}
-    <h2>Добавьте расходы или зарплату</h2>
+    <main>
+        <section class="form-section">
+            <h2>Добавьте расходы или зарплату</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="money">Введите сумму</label>
+                    <input type="number" step="0.01" name="money" id="money" required>
+                </div>
+                <div class="form-group">
+                    <label for="category_in">Категории:</label>
+                    <select name="category_in" id="category_in">
+                        <option value="">No category</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="comment">Комментарий:</label>
+                    <input type="text" name="comment" id="comment">
+                </div>
+                <div class="form-group">
+                    <label for="income">Доход?</label>
+                    <input type="checkbox" name="income" id="income">
+                </div>
+                <button type="submit" class="btn">Добавить</button>
+            </form>
+        </section>
 
-    <label for="money">Введите сумму</label>
-    <input type="number" step="0.01" name="money" id="money" required>
+        <section class="table-section">
+            <h3>Таблица расходов:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Сумма</th>
+                        <th>Категория</th>
+                        <th>Комментарий</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>
+                            {% if not expense.income %}
+                                -{{ expense.money|floatformat:2 }}
+                            {% else %}
+                                {{ expense.money|floatformat:2 }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if expense.category %}
+                                {{ expense.category.name }}
+                            {% else %}
+                                No category
+                            {% endif %}
+                        </td>
+                        <td>{{ expense.comment }}</td>
+                        <td>{{ expense.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
 
-    <label for="category_in">Категории:</label>
-    <select name="category_in" id="category_in">
-        <option value="">No category</option>
-        {% for category in categories %}
-            <option value="{{ category.id }}">{{ category.name }}</option>
-        {% endfor %}
-    </select>
-
-    <label for="comment">Комментарий:</label>
-    <input type="text" name="comment" id="comment">
-
-    <label for="income">Доход?</label>
-    <input type="checkbox" name="income" id="income">
-
-    <button type="submit">Добавить</button>
-</form>
-
-<h3>Таблица расходов:</h3>
-<table border="1">
-    <thead>
-        <tr>
-            <th>Сумма</th>
-            <th>Категория</th>
-            <th>Комментарий</th>
-            <th>Дата</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for expense in expenses %}
-        <tr>
-            <td>{{ expense.money }}</td>
-            <td>{{ expense.category.name}}</td>
-            <td>
-                <option value="{{ category.id }}">{{ category.name }}</option>
-            </td>
-            <td>{{ expense.date }}</td>
-
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+    <footer>
+        <p>&copy; 2025 Expense Tracker</p>
+    </footer>
 </body>
 </html>

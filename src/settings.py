@@ -33,6 +33,14 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+STATIC_URL = '/static/'
+
+# Если вы хотите использовать дополнительные директории
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
