@@ -22,7 +22,6 @@ class Home(View):
         categories = Category.objects.all()
         expenses = Expense.objects.filter(user=request.user).order_by('-date')
 
-
         context = {
             'categories': categories,
             'expenses': expenses,
