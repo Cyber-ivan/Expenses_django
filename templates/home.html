@@ -14,6 +14,10 @@
                 {% csrf_token %}
                 <button type="submit">Выйти</button>
             </form>
+            <form method="get" action="{% url 'settings' %}">
+                {% csrf_token %}
+                <button type="submit">Настройки</button>
+            </form>
             <h1>Привет, {{ user }}</h1>
         </div>
     </header>
