@@ -6,16 +6,61 @@
     <title>Expense Tracker</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            cursor: pointer;
+            padding: 0.8rem 1.5rem;
+            background-color: #f2f2f2;
+            border-radius: 8px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .tab:hover, .tab.active {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .group-select {
+            margin-bottom: 1rem;
+        }
+
+        .group-select label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .group-select select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
     <header>
         <div class="header-container">
-           <form method="post" action="{% url 'logout' %}">
+            <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
                 <button type="submit">Выйти</button>
             </form>
             <form method="get" action="{% url 'settings' %}">
-                {% csrf_token %}
                 <button type="submit">Настройки</button>
             </form>
             <h1>Привет, {{ user.first_name }}</h1>
@@ -52,8 +97,13 @@
             </form>
         </section>
 
-        <section class="table-section">
-            <h3>Таблица расходов:</h3>
+        <div class="tabs">
+            <div class="tab active" data-tab="personal-expenses">Мои расходы</div>
+            <div class="tab" data-tab="group-expenses">Расходы группы</div>
+        </div>
+
+        <section id="personal-expenses" class="tab-content active">
+            <h3>Таблица моих расходов:</h3>
             <table>
                 <thead>
                     <tr>
@@ -64,7 +114,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for expense in expenses %}
+                    {% for expense in personal_expenses %}
                     <tr>
                         <td>
                             {% if not expense.income %}
@@ -87,10 +137,86 @@
                 </tbody>
             </table>
         </section>
+
+        <section id="group-expenses" class="tab-content">
+            <h3>Таблица расходов группы:</h3>
+            <div class="group-select">
+                <label for="group-select">Выберите группу:</label>
+                <select id="group-select">
+                    {% for group in user_groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Сумма</th>
+                        <th>Категория</th>
+                        <th>Комментарий</th>
+                        <th>Дата</th>
+                        <th>Участник</th>
+                    </tr>
+                </thead>
+                <tbody id="group-expenses-body">
+                    {% for group_expense in group_expenses %}
+                    <tr data-group-id="{{ group_expense.user.id }}">
+                        <td>
+                            {% if not group_expense.income %}
+                                -{{ group_expense.money|floatformat:2 }}
+                            {% else %}
+                                {{ group_expense.money|floatformat:2 }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if group_expense.category %}
+                                {{ group_expense.category.name }}
+                            {% else %}
+                                No category
+                            {% endif %}
+                        </td>
+                        <td>{{ group_expense.comment }}</td>
+                        <td>{{ group_expense.date }}</td>
+                        <td>{{ group_expense.user.get_full_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
     </main>
 
     <footer>
         <p>&copy; 2025 Expense Tracker</p>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const groupSelect = document.getElementById('group-select');
+            const groupExpensesBody = document.getElementById('group-expenses-body');
+
+            // Переключение вкладок
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Фильтрация расходов по группе
+            groupSelect.addEventListener('change', () => {
+                const selectedGroupId = groupSelect.value;
+                const rows = groupExpensesBody.querySelectorAll('tr');
+
+                rows.forEach(row => {
+                    row.style.display = row.dataset.groupId === selectedGroupId ? '' : 'none';
+                });
+            });
+        });
+    </script>
 </body>
 </html>

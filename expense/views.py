@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
-from .models import Expense, Category, Group_users
+from .models import Expense, Category, Group_users, User
 from expense.forms import UserCreationForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, reverse, get_object_or_404, redirect
@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.db import transaction
 from django.views import View
-from .models import Group_users
+
 
 class Settings(View):
     template_name = 'settings.html'
@@ -77,14 +77,11 @@ class Settings(View):
         """Добавление участника в группу."""
         group_id = request.POST.get('group_id')
         email = request.POST.get('email', '').strip()
-
         if group_id and email:
-            # Проверяем существование группы
-            group = get_object_or_404(Group_users, id=group_id, user=request.user)
-            # Проверяем существование пользователя с данным email
-            member = request.user.__class__.objects.filter(email=email).first()
-            if member:
-                group.users.add(member)  # Добавляем пользователя в группу
+            group = get_object_or_404(Group_users, id=group_id)
+            member = get_object_or_404(User, email=email)
+            if request.user.my_groups.filter(id=group.id).exists():
+                member.my_groups.add(group)
 
 
 class Home(View):
@@ -92,12 +89,22 @@ class Home(View):
 
     @method_decorator(login_required)
     def get(self, request):
-        categories = Category.objects.all()
-        expenses = Expense.objects.filter(user=request.user).order_by('-date')
+        # Личные расходы
+        personal_expenses = Expense.objects.filter(user=request.user).order_by('-date')
+
+        # Группы пользователя
+        user_groups = request.user.my_groups.all()
+
+        # Расходы всех групп, где состоит пользователь
+        group_expenses = []
+        for group in user_groups:
+            group_expenses += Expense.objects.filter(user__my_groups=group).order_by('-date')
 
         context = {
-            'categories': categories,
-            'expenses': expenses,
+            'personal_expenses': personal_expenses,
+            'user_groups': user_groups,
+            'group_expenses': group_expenses,
+            'categories': Category.objects.all(),
         }
         return render(request, self.template_name, context)
 
@@ -108,23 +115,25 @@ class Home(View):
         comment = request.POST.get('comment')
         income = True if request.POST.get('income') else False
 
-        # Создаём новый расход
-        expense = Expense.objects.create(
-            user=request.user,
-            money=money,
-            category_id=category_id,
-            comment=comment,
-            income=income
-        )
-        # categories = Category.objects.all()
-        # expenses = Expense.objects.filter(user=request.user)
-        # incomes = Expense.objects.filter(user=request.user, income=True)
-        #
-        # context = {
-        #     'categories': categories,
-        #     'expenses': expenses,
-        #     'incomes': incomes,
-        # }
+        # Проверяем, добавляется ли личный или групповой расход
+        group_id = request.POST.get('group_id')  # ID выбранной группы
+        if group_id:
+            group = Group_users.objects.get(id=group_id)
+            expense = Expense.objects.create(
+                user=request.user,
+                money=money,
+                category_id=category_id,
+                comment=comment,
+                income=income
+            )
+        else:
+            expense = Expense.objects.create(
+                user=request.user,
+                money=money,
+                category_id=category_id,
+                comment=comment,
+                income=income
+            )
 
         return HttpResponseRedirect(reverse('home'))
 

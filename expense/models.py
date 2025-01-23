@@ -36,3 +36,7 @@ class Expense(models.Model):
     comment = models.TextField(null=True, blank=True)
     income = models.BooleanField(default=False)  # True: доход, False: расход
     date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.money} {self.category.name}"
+
