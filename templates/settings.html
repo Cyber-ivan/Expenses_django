@@ -38,7 +38,7 @@
             <div class="form-group">
                 <label for="last_name">Фамилия:</label>
                 <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
-                <button type="submit" name="update_surname">Обновить</button>
+                <button class="btn" type="submit" name="update_surname">Обновить</button>
             </div>
         </form>
 
@@ -49,7 +49,7 @@
                 <label for="balance">Текущая сумма:</label>
                 <input type="number" id="balance" name="balance" step="0.01" value="{{ user.money|default:0.00 }}"
                        required>
-                <button type="submit" name="update_balance">Обновить</button>
+                <button class="btn" type="submit" name="update_balance">Обновить</button>
             </div>
         </form>
     </section>
@@ -63,7 +63,7 @@
             <div class="form-group">
                 <label for="group_name">Название группы:</label>
                 <input type="text" id="group_name" name="group_name" placeholder="Введите название группы" required>
-                <button type="submit" name="create_group">Создать</button>
+                <button class="btn" type="submit" name="create_group">Создать</button>
             </div>
         </form>
     </section>
@@ -86,11 +86,8 @@
                 <label for="email">Добавить участника:</label>
                 <input type="email" id="email" name="email" placeholder="Введите email участника" required>
             </div>
-            <button type="submit" name="add_member">Добавить</button>
+            <button class="btn" type="submit" name="add_member">Добавить</button>
         </form>
-        {% if user.my_groups.all|length == 0 %}
-        <p>Вы пока не состоите ни в одной группе.</p>
-        {% endif %}
     </section>
 
 </main>
