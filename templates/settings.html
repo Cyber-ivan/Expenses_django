@@ -28,28 +28,12 @@
             <div class="form-group">
                 <label for="first_name">Имя:</label>
                 <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
-                <button class="btn" type="submit" name="update_name">Обновить</button>
-            </div>
-        </form>
-
-        <!-- Поле для фамилии -->
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
                 <label for="last_name">Фамилия:</label>
                 <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
-                <button class="btn" type="submit" name="update_surname">Обновить</button>
-            </div>
-        </form>
-
-        <!-- Поле для текущей суммы -->
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
                 <label for="balance">Текущая сумма:</label>
                 <input type="number" id="balance" name="balance" step="0.01" value="{{ user.money|default:0.00 }}"
                        required>
-                <button class="btn" type="submit" name="update_balance">Обновить</button>
+                <button class="btn" type="submit" name="update">Обновить</button>
             </div>
         </form>
     </section>

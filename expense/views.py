@@ -25,14 +25,8 @@ class Settings(View):
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         """Обработка POST-запросов для обновления данных пользователя и работы с группами."""
-        if 'update_name' in request.POST:
-            self.update_name(request)
-
-        elif 'update_surname' in request.POST:
-            self.update_surname(request)
-
-        elif 'update_balance' in request.POST:
-            self.update_balance(request)
+        if 'update' in request.POST:
+            self.update(request)
 
         elif 'create_group' in request.POST:
             self.create_group(request)
@@ -42,26 +36,18 @@ class Settings(View):
 
         return HttpResponseRedirect(reverse('settings'))
 
-    def update_name(self, request):
+    def update(self, request):
         """Обновление имени пользователя."""
         first_name = request.POST.get('first_name', '').strip()
-        if first_name:
-            request.user.first_name = first_name
-            request.user.save()
-
-    def update_surname(self, request):
-        """Обновление фамилии пользователя."""
         last_name = request.POST.get('last_name', '').strip()
-        if last_name:
+        money = request.POST.get('balance', '').strip()
+        try:
+            request.user.first_name = first_name
             request.user.last_name = last_name
+            request.user.money = float(money)
             request.user.save()
-
-    def update_balance(self, request):
-        """Обновление текущего баланса пользователя."""
-        balance = request.POST.get('balance', '').strip()
-        if balance and balance.replace('.', '', 1).isdigit():
-            request.user.money = float(balance)
-            request.user.save()
+        except Exception as e:
+            print(e)
 
     def create_group(self, request):
         """Создание новой группы."""
@@ -70,7 +56,6 @@ class Settings(View):
             with transaction.atomic():
                 new_group, created = Group_users.objects.get_or_create(name=group_name)
                 if created:
-                    # Привязываем созданную группу к пользователю
                     request.user.my_groups.add(new_group)
 
     def add_member_to_group(self, request):

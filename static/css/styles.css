@@ -109,3 +109,72 @@ table th {
         font-size: 14px;
     }
 }
+
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1rem;
+}
+
+.tab {
+    cursor: pointer;
+    padding: 0.8rem 1.5rem;
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.tab:hover, .tab.active {
+    background-color: #4caf50;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.group-select {
+    margin-bottom: 1rem;
+}
+
+.group-select label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.group-select select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.filter-dropdown {
+    position: relative;
+}
+
+.filter-options {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #ccc;
+    z-index: 100;
+    padding: 10px;
+}
+
+.filter-dropdown:hover .filter-options {
+    display: block;
+}
+
+.filter-options label {
+    display: block;
+    margin-bottom: 5px;
+}
