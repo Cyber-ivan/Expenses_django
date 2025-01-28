@@ -74,22 +74,28 @@ class Home(View):
 
     @method_decorator(login_required)
     def get(self, request):
-        # Личные расходы
         personal_expenses = Expense.objects.filter(user=request.user).order_by('-date')
-
-        # Группы пользователя
         user_groups = request.user.my_groups.all()
-
-        # Расходы всех групп, где состоит пользователь
+        selected_group_id = request.GET.get('group_id') or (user_groups.first().id if user_groups.exists() else None)
+        participants = []
         group_expenses = []
-        for group in user_groups:
-            group_expenses += Expense.objects.filter(user__my_groups=group).order_by('-date')
+
+        if selected_group_id:
+            group = Group_users.objects.get(id=selected_group_id)
+            participants = group.user_set.all()
+            group_expenses = Expense.objects.filter(user__my_groups=group).order_by('-date')
+
+        selected_participants = request.GET.getlist('participants')
+        if selected_participants:
+            group_expenses = group_expenses.filter(user_id__in=selected_participants)
 
         context = {
             'personal_expenses': personal_expenses,
             'user_groups': user_groups,
             'group_expenses': group_expenses,
             'categories': Category.objects.all(),
+            'selected_group_id': selected_group_id,
+            'participants': participants,
         }
         return render(request, self.template_name, context)
 
@@ -99,9 +105,9 @@ class Home(View):
         category_id = request.POST.get('category_in')
         comment = request.POST.get('comment')
         income = True if request.POST.get('income') else False
+        group_id = request.POST.get('group_id')
+        selected_participants = request.POST.getlist('participants')
 
-        # Проверяем, добавляется ли личный или групповой расход
-        group_id = request.POST.get('group_id')  # ID выбранной группы
         if group_id:
             group = Group_users.objects.get(id=group_id)
             expense = Expense.objects.create(

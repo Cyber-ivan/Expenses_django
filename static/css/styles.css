@@ -170,11 +170,17 @@ table th {
     padding: 10px;
 }
 
-.filter-dropdown:hover .filter-options {
-    display: block;
+/* Добавьте эти стили в ваш styles.css */
+.filter-dropdown .filter-options {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    z-index: 100;
+    padding: 10px;
+    width: 200px;
 }
 
-.filter-options label {
+#participant-header:hover .filter-options {
     display: block;
-    margin-bottom: 5px;
 }
